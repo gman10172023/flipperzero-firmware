@@ -13,33 +13,27 @@ def __generate_resources_dist_entries(env):
     resources_root = env.Dir(env["RESOURCES_ROOT"])
 
     for app_artifacts in env["FW_EXTAPPS"].application_map.values():
-        for _, dist_path in filter(
-            lambda dist_entry: dist_entry[0], app_artifacts.dist_entries
-        ):
-            src_target_entries.append(
-                (
-                    app_artifacts.compact,
-                    resources_root.File(dist_path),
-                )
+        src_target_entries.extend(
+            (app_artifacts.compact, resources_root.File(dist_path))
+            for _, dist_path in filter(
+                lambda dist_entry: dist_entry[0], app_artifacts.dist_entries
             )
-
+        )
     # Deploy apps' resources too
     for app in env["APPBUILD"].apps:
         if not app.resources:
             continue
         apps_resource_dir = app._appdir.Dir(app.resources)
-        for res_file in env.GlobRecursive("*", apps_resource_dir):
-            if not isinstance(res_file, File):
-                continue
-            src_target_entries.append(
-                (
-                    res_file,
-                    resources_root.File(
-                        res_file.get_path(apps_resource_dir),
-                    ),
-                )
+        src_target_entries.extend(
+            (
+                res_file,
+                resources_root.File(
+                    res_file.get_path(apps_resource_dir),
+                ),
             )
-
+            for res_file in env.GlobRecursive("*", apps_resource_dir)
+            if isinstance(res_file, File)
+        )
     # Deploy other stuff from _EXTRA_DIST
     for extra_dist in env["_EXTRA_DIST"]:
         if isinstance(extra_dist, Dir):

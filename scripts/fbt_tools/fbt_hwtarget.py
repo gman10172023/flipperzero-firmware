@@ -30,8 +30,7 @@ class HardwareTargetLoader:
         if not target_json_file.exists():
             raise Exception(f"Target file {target_json_file} does not exist")
         with open(target_json_file.get_abspath(), "r") as f:
-            vals = json.load(f)
-            return vals
+            return json.load(f)
 
     def _processTargetDefinitions(self, target_id):
         target_dir = self._getTargetDir(target_id)
@@ -86,7 +85,7 @@ class HardwareTargetLoader:
             seen_filenames.update(f.name for f in accepted_sources)
             sources.extend(accepted_sources)
         # print(f"Found {len(sources)} sources: {list(f.path for f in sources)}")
-        return list(f.get_path(self.all_targets_root_dir) for f in sources)
+        return [f.get_path(self.all_targets_root_dir) for f in sources]
 
     def gatherSdkHeaders(self):
         sdk_headers = []

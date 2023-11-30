@@ -33,8 +33,8 @@ def GlobRecursive(env, pattern, node=".", exclude=[]):
 def GatherSources(env, sources_list, node="."):
     sources_list = list(set(Flatten(sources_list)))
     include_sources = list(filter(lambda x: not x.startswith("!"), sources_list))
-    exclude_sources = list(x[1:] for x in sources_list if x.startswith("!"))
-    gathered_sources = list(
+    exclude_sources = [x[1:] for x in sources_list if x.startswith("!")]
+    return list(
         itertools.chain.from_iterable(
             env.GlobRecursive(
                 source_type,
@@ -44,11 +44,6 @@ def GatherSources(env, sources_list, node="."):
             for source_type in include_sources
         )
     )
-    ## Debug
-    # print(
-    #     f"Gathered sources for {sources_list} from {node}: {list(f.path for f in gathered_sources)}"
-    # )
-    return gathered_sources
 
 
 def generate(env):
